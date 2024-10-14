@@ -12,7 +12,7 @@ variable "region" {
 variable "zone" {
   description = "The zone where GCP resources will be created"
   type        = string
-  default     = "europe-west1-a"
+  default     = "europe-west1-b"
 }
 
 variable "origin_server_count" {

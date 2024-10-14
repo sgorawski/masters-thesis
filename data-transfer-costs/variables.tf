@@ -13,5 +13,5 @@ variable "region" {
 variable "zone" {
   description = "The zone where centralized resources will be created"
   type        = string
-  default     = "europe-west1-a"
+  default     = "europe-west1-b"
 }

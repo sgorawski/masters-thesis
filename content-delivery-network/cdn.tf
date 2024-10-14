@@ -1,6 +1,6 @@
 # GCS Bucket for content storage
 resource "google_storage_bucket" "cdn_bucket" {
-  name     = "cdn-bucket"
+  name     = "${var.project_id}-cdn-bucket"
   location = var.region
 }
 

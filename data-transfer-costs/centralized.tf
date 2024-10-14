@@ -7,13 +7,12 @@ resource "google_compute_instance" "centralized_application_server" {
 
   boot_disk {
     initialize_params {
-      image = "debian-cloud/debian-10"
+      image = "debian-cloud/debian-12"
     }
   }
 
   network_interface {
     network = "default"
-    access_config {}
   }
 
   metadata = {
@@ -21,6 +20,12 @@ resource "google_compute_instance" "centralized_application_server" {
   }
 
   tags = ["centralized-application-server"]
+}
+
+resource "google_compute_instance_group" "centralized_instance_group" {
+  name      = "centralized-instance-group"
+  zone      = var.zone
+  instances = google_compute_instance.centralized_application_server[*].self_link
 }
 
 # Firewall rule to allow HTTP traffic
@@ -37,16 +42,25 @@ resource "google_compute_firewall" "centralized_firewall" {
   target_tags   = ["centralized-application-server"]
 }
 
+# Health Check
+resource "google_compute_health_check" "centralized_http_health_check" {
+  name               = "centralized-http-health-check"
+  check_interval_sec = 5
+  timeout_sec        = 5
+
+  http_health_check {
+    port = 80
+  }
+}
+
 # Backend Service for Load Balancer
 resource "google_compute_backend_service" "centralized_backend_service" {
   name                  = "centralized-backend-service"
   load_balancing_scheme = "EXTERNAL"
+  health_checks         = [google_compute_health_check.centralized_http_health_check.self_link]
 
-  dynamic "backend" {
-    for_each = google_compute_instance.centralized_application_server[*]
-    content {
-      group = backend.value.self_link
-    }
+  backend {
+    group = google_compute_instance_group.centralized_instance_group.self_link
   }
 }
 

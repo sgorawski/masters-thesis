@@ -4,13 +4,12 @@ resource "google_compute_instance_template" "autoscaling_instance_template" {
   machine_type = "n1-standard-1"
 
   disk {
-    source_image = "debian-cloud/debian-10"
+    source_image = "debian-cloud/debian-12"
     auto_delete  = true
   }
 
   network_interface {
     network = "default"
-    access_config {}
   }
 
   tags = ["autoscaling-application-server"]
@@ -64,10 +63,22 @@ resource "google_compute_firewall" "autoscaling_firewall" {
   target_tags   = google_compute_instance_template.autoscaling_instance_template.tags
 }
 
+# Health Check
+resource "google_compute_health_check" "autoscaling_http_health_check" {
+  name               = "autoscaling-http-health-check"
+  check_interval_sec = 5
+  timeout_sec        = 5
+
+  http_health_check {
+    port = 80
+  }
+}
+
 # Backend Service for Load Balancer
 resource "google_compute_backend_service" "autoscaling_backend_service" {
   name                  = "autoscaling-backend-service"
   load_balancing_scheme = "EXTERNAL"
+  health_checks         = [google_compute_health_check.autoscaling_http_health_check.self_link]
 
   backend {
     group = google_compute_instance_group_manager.ausoscaling_instance_group_manager.instance_group

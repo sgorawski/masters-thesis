@@ -6,7 +6,7 @@ resource "google_compute_instance" "us_instance" {
 
   boot_disk {
     initialize_params {
-      image = "debian-cloud/debian-10"
+      image = "debian-cloud/debian-12"
     }
   }
 
@@ -25,7 +25,7 @@ resource "google_compute_instance" "asia_instance" {
 
   boot_disk {
     initialize_params {
-      image = "debian-cloud/debian-10"
+      image = "debian-cloud/debian-12"
     }
   }
 
@@ -40,20 +40,29 @@ resource "google_compute_instance" "asia_instance" {
 resource "google_compute_instance" "europe_instance" {
   name         = "gcp-server-europe"
   machine_type = "n1-standard-1"
-  zone         = "europe-west1-a"
+  zone         = "europe-west1-b"
 
   boot_disk {
     initialize_params {
-      image = "debian-cloud/debian-10"
+      image = "debian-cloud/debian-12"
     }
   }
 
   network_interface {
     network = "default"
-    access_config {}
   }
 
   tags = ["duplicated-http-server"]
+}
+
+resource "google_compute_instance_group" "duplicated_instance_group" {
+  name = "duplicated-instance-group"
+  zone = var.zone
+  instances = [
+    google_compute_instance.us_instance.self_link,
+    google_compute_instance.asia_instance.self_link,
+    google_compute_instance.europe_instance.self_link,
+  ]
 }
 
 # Firewall rule to allow HTTP traffic
@@ -70,21 +79,25 @@ resource "google_compute_firewall" "duplicated_firewall" {
   target_tags   = ["duplicated-http-server"]
 }
 
+# Health Check
+resource "google_compute_health_check" "duplicated_http_health_check" {
+  name               = "duplicated-http-health-check"
+  check_interval_sec = 5
+  timeout_sec        = 5
+
+  http_health_check {
+    port = 80
+  }
+}
+
 # Backend Service for Load Balancer
 resource "google_compute_backend_service" "duplicated_backend_service" {
   name                  = "duplicated-backend-service"
   load_balancing_scheme = "EXTERNAL"
+  health_checks         = [google_compute_health_check.duplicated_http_health_check.self_link]
 
   backend {
-    group = google_compute_instance.us_instance.self_link
-  }
-
-  backend {
-    group = google_compute_instance.asia_instance.self_link
-  }
-
-  backend {
-    group = google_compute_instance.europe_instance.self_link
+    group = google_compute_instance_group.duplicated_instance_group.self_link
   }
 }
 
