@@ -22,9 +22,10 @@ resource "aws_key_pair" "generated_key" {
 
 # g3.4xlarge instance
 resource "aws_instance" "g3_instance" {
-  ami           = data.aws_ami.debian10.id
-  instance_type = "g3.4xlarge"
-  key_name      = aws_key_pair.generated_key.key_name
+  ami               = data.aws_ami.debian10.id
+  instance_type     = "g3.4xlarge"
+  availability_zone = var.availability_zone
+  key_name          = aws_key_pair.generated_key.key_name
 
   tags = {
     Name = "g3-4xlarge-instance"
@@ -33,9 +34,10 @@ resource "aws_instance" "g3_instance" {
 
 # p3.2xlarge instance
 resource "aws_instance" "p3_instance" {
-  ami           = data.aws_ami.debian10.id
-  instance_type = "p3.2xlarge"
-  key_name      = aws_key_pair.generated_key.key_name
+  ami               = data.aws_ami.debian10.id
+  instance_type     = "p3.2xlarge"
+  availability_zone = var.availability_zone
+  key_name          = aws_key_pair.generated_key.key_name
 
   tags = {
     Name = "p3-2xlarge-instance"
@@ -44,9 +46,10 @@ resource "aws_instance" "p3_instance" {
 
 # p3.2xlarge spot instance (using instance_market_options)
 resource "aws_instance" "p3_spot_instance" {
-  ami           = data.aws_ami.debian10.id
-  instance_type = "p3.2xlarge"
-  key_name      = aws_key_pair.generated_key.key_name
+  ami               = data.aws_ami.debian10.id
+  instance_type     = "p3.2xlarge"
+  availability_zone = var.availability_zone
+  key_name          = aws_key_pair.generated_key.key_name
 
   instance_market_options {
     market_type = "spot"

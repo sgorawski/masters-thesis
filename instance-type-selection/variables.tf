@@ -1,7 +1,13 @@
 variable "region" {
   description = "AWS region"
   type        = string
-  default     = "us-east-1"
+  default     = "eu-west-1"
+}
+
+variable "availability_zone" {
+  description = "AWS availability zone to use for server instances"
+  type        = string
+  default     = "eu-west-1a"
 }
 
 variable "spot_price" {

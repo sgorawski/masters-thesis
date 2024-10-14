@@ -35,10 +35,18 @@ To authenticate, run `gcloud auth application-default login`. Terraform will pro
 
 ### AWS
 
-The default credentials should be used.
+An AWS account is needed, with credit card billing enabled.
+Creating the resources just for a couple minutes should not use much money, as long us we remember to always clean them up (see below for instructions).
 
-How to use a project:
-1. `cd` to the project directory.
+You'll need an AWS IAM user with an access key. (Note: There are many ways to do auth in AWS, I'm only documenting one that in my opinion is the easiest.)
+You'll also need AWS CLI v2: https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html.
+
+Run `aws configure` to configure your default credentials, which will be stored under `~/.aws/`. The default credentials should be used by Terraform.
+
+### Terraform
+
+How to use code from a given chapter:
+1. `cd` to the chapter directory.
 2. Run `terraform init` to install the required providers (Google or AWS).
 3. Create a configuration file `config.tfvars` with variables from the `variables.tf` file. Some of them have defaults, but some are required. Example:
     ```terraform
@@ -105,6 +113,9 @@ This project creates three EC2 instances (virtual machines; all in `main.tf`):
 
 Configurable: maximum price to pay for the spot instance (in USD/hour).
 
+Execute the Terraform project as described in Usage.
+See created instances under: https://eu-west-1.console.aws.amazon.com/ec2/home (change region in settings if needed).
+
 ### 5 Data transfer costs
 
 Provider: Google
@@ -123,7 +134,10 @@ This project created two PostgreSQL database servers:
 1. An RDS database (`db-rds.tf`).
 2. An Aurora Serverless v2 database (`db-aurora.tf`).
 
-Configurable: storage to allocate for the RDS database, in GB. (Aurora is autoscaling.)
+Configurable: DB username, DB password storage to allocate for the RDS database, in GB. (Aurora is autoscaling.)
+
+Execute the Terraform project as described in Usage.
+See created databases under: https://eu-west-1.console.aws.amazon.com/rds/home (change region in settings if needed).
 
 ---
 
