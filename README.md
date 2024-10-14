@@ -35,7 +35,7 @@ How to use a project:
 3. Run `terraform plan -var-file="config.tfvars"` to see how Terraform plans to create the infrastructure (this does not do anything yet).
 4. Run `terraform apply -var-file="config.tfvars"` to create the resources in your cloud account.
 5. Go to the cloud web console and see that the requested resources were created.
-6. Run `terraform destory` to destroy all previously created resources.
+6. Run `terraform destroy` to destroy all previously created resources.
 
 
 ## Chapters
